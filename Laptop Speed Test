@@ -1,0 +1,47 @@
+
+import psutil
+
+def get_cpu_usage():
+    # Returns CPU usage as a percentage
+    return psutil.cpu_percent(interval=1)
+
+def get_memory_usage():
+    # Returns memory usage as a percentage
+    memory = psutil.virtual_memory()
+    return memory.percent
+
+def get_disk_usage():
+    # Returns disk usage as a percentage
+    disk = psutil.disk_usage('/')
+    return disk.percent
+
+def calculate_laptop_speed():
+    # Get system performance indicators
+    cpu_usage = get_cpu_usage()
+    memory_usage = get_memory_usage()
+    disk_usage = get_disk_usage()
+
+    # Weights for each factor, adjusted to give more weight to CPU and Memory
+    cpu_weight = 0.4
+    memory_weight = 0.4
+    disk_weight = 0.2
+
+    # We want to scale the results, so lower percentages mean better performance.
+    # We'll reverse the metrics, subtracting from 100, since higher usage means worse performance.
+    cpu_speed = 100 - cpu_usage
+    memory_speed = 100 - memory_usage
+    disk_speed = 100 - disk_usage
+
+    # Calculate the weighted average of the three components
+    laptop_speed = (cpu_speed * cpu_weight) + (memory_speed * memory_weight) + (disk_speed * disk_weight)
+
+    # Return the final estimated laptop speed (clamped between 1 and 100)
+    return max(1, min(laptop_speed, 100))
+
+if __name__ == "__main__":
+    # Calculate and display laptop speed
+    speed = calculate_laptop_speed()
+    print(f"Your laptop's speed is approximately: {speed:.2f}%")
+
+    # Wait for user to press Enter before closing
+    input("Press Enter to exit...")
